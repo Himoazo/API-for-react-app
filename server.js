@@ -4,7 +4,7 @@ app.use(express.json());
 const port = 3000
 const db = require("./db");
 
-
+// Middleware to validate input
 function inputValidation(req, res, next) {
     
     const { todo, description, status } = req.body;
