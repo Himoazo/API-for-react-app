@@ -62,13 +62,27 @@ app.post('/api', inputValidation, (req, res) => {
   
 
 app.put('/api/:id', inputValidation, (req, res) => {
-    
+    const { todo, description, status } = req.body;
+    const { id } = req.params;
+
+    db.get("SELECT id FROM Todos WHERE id = ?", [id], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ error: "Todo was not found" });
+
+        const update = db.prepare("UPDATE Todos SET todo_name = ?, description = ?, status = ? WHERE id = ?");
+        update.run(todo, description, status, id, function (err) {
+            if (err) return res.status(500).json({ error: err.message });
+
+            res.status(200).json({ success: "A todo has been updated" });
+            update.finalize();
+        });
+    });
 });
+
   
 
-app.delete('/user', (req, res) => {
-    res.send('Got a DELETE request at /user')
-});
+
+
 
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`)
