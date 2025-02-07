@@ -5,17 +5,8 @@ const port = 3000
 const db = require("./db");
 
 
-app.get('/api', async (req, res) => {
-    db.all("SELECT * FROM Todos", [], (err, rows) => { 
-        if (err) {
-            return res.status(500).json({error: err.message});
-        }
-        res.json(rows);
-    });
-  
-});
-
 function inputValidation(req, res, next) {
+    
     const { todo, description, status } = req.body;
 
     if (typeof todo !== "string" || typeof description !== "string") {
@@ -44,20 +35,31 @@ function inputValidation(req, res, next) {
 }
 
 
+app.get('/api', async (req, res) => {
+    db.all("SELECT * FROM Todos", [], (err, rows) => { 
+        if (err) {
+            return res.status(500).json({error: err.message});
+        }
+        res.json(rows);
+    });
+  
+});
+
+
+
 app.post('/api', inputValidation, (req, res) => {
-    const todoName = req.body.todo;
-    const description = req.body.description;
-    const status = req.body.status;
+    const { todo, description, status } = req.body;
 
     
     const insertion = db.prepare("INSERT INTO Todos (todo_name, description, status) VALUES (?, ?, ?)");
-    insertion.run(todoName, description, status, (err) => {
+    insertion.run(todo, description, status, (err) => {
         if (err) {
             return res.status(500).json({ error: err.message })
         }
-        return res.status(201).json({ succes: "A todo has been created" });
+        res.status(201).json({ succes: "A todo has been created" });
+        insertion.finalize();
     });
-    insertion.finalize();    
+        
 });
   
 
@@ -81,7 +83,22 @@ app.put('/api/:id', inputValidation, (req, res) => {
 
   
 
+app.delete('/api/:id', (req, res) => {
+    const { id } = req.params;
 
+    db.get("SELECT id FROM Todos WHERE id = ?", [id], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ error: "Todo was not found" });
+
+        const deleteTodo = db.prepare("DELETE FROM Todos WHERE id = ?");
+        deleteTodo.run(id, (err) => { 
+            if (err) return res.status(500).json({ error: err.message });
+
+            res.status(200).json({ success: "A todo has been deleted" });
+            deleteTodo.finalize();
+        });
+    });
+});
 
 
 app.listen(port, () => {
