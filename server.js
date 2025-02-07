@@ -15,13 +15,54 @@ app.get('/api', async (req, res) => {
   
 });
 
-app.post('/', (req, res) => {
-    res.send('Got a POST request')
+function inputValidation(req, res, next) {
+    const { todo, description, status } = req.body;
+
+    if (typeof todo !== "string" || typeof description !== "string") {
+        return res.status(400).json({ error: "Todo and description must be strings" });
+    }
+
+    if (!todo || todo.trim() === "") {
+        return res.status(400).json({ error: "Name can't be empty" });
+    }
+    if (todo.length < 1 || todo.length > 30) {
+        return res.status(400).json({ error: "Name must be between 1 and 30 chars" });
+    }
+
+    if (!description || description.trim() === "") {
+        return res.status(400).json({ error: "Description can't be empty" });
+    }
+    if (description.length < 1 || description.length > 100) {
+        return res.status(400).json({ error: "Description must be between 1 and 100 chars" });
+    }
+
+    if (status === undefined || !Number.isInteger(status) || status < 0 || status > 2) {
+        return res.status(400).json({ error: "Invalid status" });
+    }
+
+    next();
+}
+
+
+app.post('/api', inputValidation, (req, res) => {
+    const todoName = req.body.todo;
+    const description = req.body.description;
+    const status = req.body.status;
+
+    
+    const insertion = db.prepare("INSERT INTO Todos (todo_name, description, status) VALUES (?, ?, ?)");
+    insertion.run(todoName, description, status, (err) => {
+        if (err) {
+            return res.status(500).json({ error: err.message })
+        }
+        return res.status(201).json({ succes: "A todo has been created" });
+    });
+    insertion.finalize();    
 });
   
 
-app.put('/user', (req, res) => {
-    res.send('Got a PUT request at /user')
+app.put('/api/:id', inputValidation, (req, res) => {
+    
 });
   
 

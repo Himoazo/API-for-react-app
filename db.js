@@ -15,7 +15,7 @@ db.serialize(() => {
     CREATE TABLE IF NOT EXISTS Todos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         todo_name TEXT NOT NULL,
-        description TEXT,
+        description TEXT NOT NULL,
         status INTEGER NOT NULL CHECK (status IN (0, 1, 2)),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
         )
