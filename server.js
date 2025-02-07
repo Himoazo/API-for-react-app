@@ -3,6 +3,10 @@ const app = express()
 app.use(express.json());
 const port = 3000
 const db = require("./db");
+//Cors
+const cors = require("cors");
+app.use(cors());
+
 
 // Middleware to validate input
 function inputValidation(req, res, next) {
