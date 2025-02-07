@@ -16,15 +16,12 @@ function inputValidation(req, res, next) {
     if (!todo || todo.trim() === "") {
         return res.status(400).json({ error: "Name can't be empty" });
     }
-    if (todo.length < 1 || todo.length > 30) {
-        return res.status(400).json({ error: "Name must be between 1 and 30 chars" });
+    if (todo.length < 3 || todo.length > 30) {
+        return res.status(400).json({ error: "Name must be between 3 and 30 chars" });
     }
 
-    if (!description || description.trim() === "") {
-        return res.status(400).json({ error: "Description can't be empty" });
-    }
-    if (description.length < 1 || description.length > 100) {
-        return res.status(400).json({ error: "Description must be between 1 and 100 chars" });
+    if (description.length > 200) {
+        return res.status(400).json({ error: "Description can't be more than 200 chars" });
     }
 
     if (status === undefined || !Number.isInteger(status) || status < 0 || status > 2) {
