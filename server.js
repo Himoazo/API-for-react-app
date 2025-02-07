@@ -45,7 +45,14 @@ app.get('/api', async (req, res) => {
   
 });
 
-
+app.get('/api/:id', async (req, res) => {
+    const { id } = req.params;
+    db.get("SELECT * FROM Todos WHERE id = ?", [id], (err, row) => { 
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ error: "Todo not found" });
+        return res.json(row);
+    });
+});
 
 app.post('/api', inputValidation, (req, res) => {
     const { todo, description, status } = req.body;
