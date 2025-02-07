@@ -9,7 +9,7 @@ function inputValidation(req, res, next) {
     
     const { todo, description, status } = req.body;
 
-    if (typeof todo !== "string" || typeof description !== "string") {
+    if (typeof todo !== "string" || (description && typeof description !== "string")) {
         return res.status(400).json({ error: "Todo and description must be strings" });
     }
 
