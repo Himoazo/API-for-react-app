@@ -35,7 +35,7 @@ function inputValidation(req, res, next) {
 }
 
 
-app.get('/api', async (req, res) => {
+app.get('/api', (req, res) => {
     db.all("SELECT * FROM Todos", [], (err, rows) => { 
         if (err) {
             return res.status(500).json({error: err.message});
@@ -45,7 +45,7 @@ app.get('/api', async (req, res) => {
   
 });
 
-app.get('/api/:id', async (req, res) => {
+app.get('/api/:id', (req, res) => {
     const { id } = req.params;
     db.get("SELECT * FROM Todos WHERE id = ?", [id], (err, row) => { 
         if (err) return res.status(500).json({ error: err.message });
@@ -108,9 +108,12 @@ app.delete('/api/:id', (req, res) => {
 });
 
 
-app.listen(port, () => {
-    console.log(`Server is running on port: ${port}`)
-}); 
-
+app.listen(port, '0.0.0.0', (error) => {
+    if (error) {
+        console.log(error); 
+        throw error;  
+    }
+    console.log(`Server is running on port: ${port}`);
+});
 
 
